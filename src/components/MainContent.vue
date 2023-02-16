@@ -1,41 +1,63 @@
 <script setup lang="ts">
-import IconTrash from "@/components/icons/IconTrash.vue";
-import { ref, onMounted } from "vue";
+import { ref, watch } from "vue";
+import { useRoute, useRouter } from "vue-router";
+import { storeToRefs } from "pinia";
 import Datepicker from "vue3-datepicker";
+import { useTodoStore } from "@/stores/todo";
+import IconTrash from "@/components/icons/IconTrash.vue";
+import { convertBase64 } from "@/utils";
+
+defineProps({
+  modelValue: String,
+});
+
+const store = useTodoStore();
+const route = useRoute();
+const router = useRouter();
+const { currentTodo } = storeToRefs(store);
+const picked = ref(new Date());
 
 const TEXTAREAR_MAX_LENGTH = 200;
-const todoContent = ref("");
 const remainingCount = ref(0);
-const onKeyUp = () => {
-  remainingCount.value = todoContent.value.length;
+const onKeyUp = (evt: Event) => {
+  store.onChangeTodo("content", (evt.target as HTMLInputElement).value);
+  remainingCount.value = store.currentTodo.content.length;
 };
 
 const imgPreview = ref<HTMLImageElement | null>(null);
 const hasImage = ref(false);
-onMounted(() => {
-  if (imgPreview.value?.src) {
-    hasImage.value = true;
-  }
-});
 
-const onFileChange = (evt: Event) => {
-  const target = evt.target as HTMLInputElement;
-  const files = target.files;
-  if (!files || !files.length) return;
-  imgPreview.value!.src = URL.createObjectURL(files[0]);
-  imgPreview.value!.onload = function () {
-    hasImage.value = true;
-    URL.revokeObjectURL(imgPreview.value!.src);
-  };
+watch(
+  () => route.params.id,
+  () => {
+    imgPreview.value!.src = store.currentTodo.image;
+    hasImage.value = !!store.currentTodo.image;
+    remainingCount.value = store.currentTodo.content.length;
+  }
+);
+const onFileChange = async (evt: Event) => {
+  const element = evt.target as HTMLInputElement;
+  if (!element || !imgPreview.value) return;
+  const file = element.files![0];
+  const base64 = (await convertBase64(file)) as string;
+  store.onChangeTodo("image", base64);
+  imgPreview.value.src = base64;
+  hasImage.value = true;
+  element.value = "";
 };
 
-const picked = ref(new Date());
+const onDeleteTodo = () => {
+  const nextTodoId = store.deleteTodo(currentTodo.value.id);
+  router.push(`/todo/${nextTodoId}`);
+};
 </script>
 
 <template>
   <div class="flex-1 p-5 space-y-4">
-    <div>
+    <div class="h-6">
       <IconTrash
+        v-if="store.currentTodo.order !== 1"
+        @click="onDeleteTodo"
         role="button"
         class="w-6 h-6 ml-auto stroke-[#292D32] hover:stroke-red-600"
       />
@@ -44,13 +66,17 @@ const picked = ref(new Date());
       <input
         class="w-full p-4 item"
         type="text"
-        placeholder="Press new item title"
+        placeholder="New item title"
+        :value="currentTodo.title"
+        @input="
+          store.onChangeTodo('title', ($event.target as HTMLInputElement).value)
+        "
       />
     </div>
     <div class="flex items-center justify-between h-[30vh] gap-5">
       <div class="relative w-3/5 h-full">
         <textarea
-          v-model="todoContent"
+          :value="currentTodo.content"
           @keyup="onKeyUp"
           class="w-full h-full p-4 resize-none item"
           placeholder="Content..."

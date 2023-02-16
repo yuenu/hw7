@@ -1,12 +1,29 @@
 <script setup lang="ts">
-// import { RouterLink, RouterView } from 'vue-router'
+import { RouterView, useRoute, useRouter } from "vue-router";
+import { watch, onMounted } from "vue";
+import { useTodoStore } from "@/stores/todo";
+
 import Sidebar from "@/components/SideBar.vue";
-import MainContent from "@/components/MainContent.vue";
+
+const store = useTodoStore();
+const route = useRoute();
+const router = useRouter();
+
+onMounted(() => {
+  router.push(`/todo/${store.todos[0].id}`);
+});
+
+watch(
+  () => route.params.id,
+  (newId) => {
+    store.setCurrentTodo(newId as string);
+  }
+);
 </script>
 
 <template>
-  <main class="h-screen flex">
+  <main class="flex h-screen">
     <Sidebar />
-    <MainContent />
+    <RouterView />
   </main>
 </template>
