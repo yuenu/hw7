@@ -86,6 +86,20 @@ export const useTodoStore = defineStore("todo", () => {
     return jumpToTodoId;
   };
 
+  const setTodos = (newTodos: TodoType[]) => {
+    const updateTodos = newTodos.map((todo, index) => ({
+      ...todo,
+      order: index + 1,
+    }));
+
+    const updateCurrentTodo = updateTodos.find(
+      (todo) => todo.id === currentTodo.value.id
+    );
+    if (updateCurrentTodo) currentTodo.value = updateCurrentTodo;
+
+    todos.value = updateTodos;
+  };
+
   return {
     todos,
     currentTodo,
@@ -94,6 +108,7 @@ export const useTodoStore = defineStore("todo", () => {
     setCurrentTodo,
     deleteTodo,
     setTodo,
+    setTodos,
   };
 });
 
