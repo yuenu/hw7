@@ -5,6 +5,7 @@ import { storeToRefs } from "pinia";
 import Datepicker from "vue3-datepicker";
 import { useTodoStore } from "@/stores/todo";
 import IconTrash from "@/components/icons/IconTrash.vue";
+import IconMenu from "./icons/IconMenu.vue";
 import { convertBase64 } from "@/utils";
 
 const store = useTodoStore();
@@ -75,9 +76,14 @@ const endTimeLowerLimit = computed(() => {
 
 <template>
   <div class="flex-1 p-5 space-y-4">
-    <div class="h-6">
+    <div class="flex justify-between h-6">
+      <IconMenu
+        class="w-6 h-6 md:opacity-0 md:pointer-events-none"
+        role="button"
+        @click="store.setIsMenuOpen(true)"
+      />
       <IconTrash
-        v-if="store.currentTodo.order !== 1"
+        v-show="store.currentTodo.order !== 1"
         @click="onDeleteTodo"
         role="button"
         class="w-6 h-6 ml-auto stroke-[#292D32] hover:stroke-red-600"
@@ -92,8 +98,10 @@ const endTimeLowerLimit = computed(() => {
         @input="onInputTitleChange"
       />
     </div>
-    <div class="flex items-center justify-between h-[30vh] gap-5">
-      <div class="relative w-3/5 h-full">
+    <div
+      class="flex flex-col items-center justify-between h-auto md:h-[30vh] gap-5 md:flex-row"
+    >
+      <div class="relative w-full h-40 md:w-3/5 md:h-full">
         <textarea
           :value="currentTodo.content"
           @keyup="onKeyUp"
@@ -105,7 +113,12 @@ const endTimeLowerLimit = computed(() => {
           >{{ remainingCount }} / {{ TEXTAREAR_MAX_LENGTH }}</span
         >
       </div>
-      <div class="relative flex-1 h-full overflow-hidden item">
+      <div
+        :class="[
+          'relative flex-1 w-full overflow-hidden min-h-[20rem] mt-16 max-h-[20rem]  item',
+          'md:mt-0 md:h-full md:min-h-full',
+        ]"
+      >
         <img
           ref="imgPreview"
           :class="[
@@ -124,7 +137,12 @@ const endTimeLowerLimit = computed(() => {
       </div>
     </div>
     <div class="flex items-center gap-5">
-      <div class="flex items-center w-3/5 gap-5">
+      <div
+        :class="[
+          'flex items-center gap-5 absolute top-[19.5rem] left-0 w-full px-5',
+          'md:static md:w-3/5 md:px-0',
+        ]"
+      >
         <Datepicker
           class="w-full h-12 text-center rounded-lg bg-gray-cool"
           v-model="store.currentTodo.startTime"

@@ -4,6 +4,7 @@ import { watch, onMounted } from "vue";
 import { useTodoStore } from "@/stores/todo";
 
 import Sidebar from "@/components/SideBar.vue";
+import MobileSideBar from "./components/MobileSideBar.vue";
 
 const store = useTodoStore();
 const route = useRoute();
@@ -23,7 +24,8 @@ watch(
 
 <template>
   <main class="flex h-screen">
-    <Sidebar />
+    <Sidebar class="hidden 123213 md:block" />
+    <MobileSideBar />
     <RouterView />
   </main>
 </template>

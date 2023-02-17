@@ -19,6 +19,11 @@ const INITIAL_TODO = {
 export const useTodoStore = defineStore("todo", () => {
   const todos = ref([INITIAL_TODO]);
   const currentTodo = ref(INITIAL_TODO);
+  const isMenuOpen = ref(false);
+
+  const setIsMenuOpen = (val: boolean) => {
+    isMenuOpen.value = val;
+  };
 
   const addTodo = () => {
     const addItem = {
@@ -102,6 +107,7 @@ export const useTodoStore = defineStore("todo", () => {
 
   return {
     todos,
+    isMenuOpen,
     currentTodo,
     addTodo,
     onChangeTodo,
@@ -109,6 +115,7 @@ export const useTodoStore = defineStore("todo", () => {
     deleteTodo,
     setTodo,
     setTodos,
+    setIsMenuOpen,
   };
 });
 

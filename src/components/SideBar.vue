@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { computed } from "vue";
 import { useTodoStore } from "@/stores/todo";
-import { useRoute, useRouter } from "vue-router";
+import { useRouter } from "vue-router";
 import draggable from "vuedraggable";
+import IconClose from "./icons/IconClose.vue";
 
 const store = useTodoStore();
-const route = useRoute();
 const router = useRouter();
 
 const onClickItem = (todoId: string) => {
@@ -29,8 +29,17 @@ const myList = computed({
 </script>
 
 <template>
-  <div class="h-screen bg-primary-200 w-[250px]">
-    <h1 class="px-3 py-4 text-lg font-semibold">Demo Todo List</h1>
+  <div class="sidebar">
+    <h1
+      class="flex items-center justify-between px-3 py-4 text-lg font-semibold"
+    >
+      Demo Todo List
+      <IconClose
+        class="w-6 h-6"
+        role="button"
+        @click="store.setIsMenuOpen(false)"
+      />
+    </h1>
     <div class="mb-6">
       <draggable v-model="myList" item-key="id">
         <template #item="{ element }">
@@ -62,6 +71,11 @@ const myList = computed({
 </template>
 
 <style scoped lang="scss">
+.sidebar {
+  @apply h-screen bg-primary-200 w-[250px] z-30;
+  @apply md:static md:translate-x-0;
+}
+
 .item-active {
   position: relative;
   &::before {
