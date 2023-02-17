@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, watch } from "vue";
+import { ref, watch, computed } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { storeToRefs } from "pinia";
 import Datepicker from "vue3-datepicker";
@@ -7,20 +7,26 @@ import { useTodoStore } from "@/stores/todo";
 import IconTrash from "@/components/icons/IconTrash.vue";
 import { convertBase64 } from "@/utils";
 
-defineProps({
-  modelValue: String,
-});
-
 const store = useTodoStore();
 const route = useRoute();
 const router = useRouter();
 const { currentTodo } = storeToRefs(store);
-const picked = ref(new Date());
 
 const TEXTAREAR_MAX_LENGTH = 200;
 const remainingCount = ref(0);
+
+const onInputTitleChange = (evt: Event) => {
+  store.onChangeTodo({
+    proporty: "title",
+    changeValue: (evt.target as HTMLInputElement).value,
+  });
+};
+
 const onKeyUp = (evt: Event) => {
-  store.onChangeTodo("content", (evt.target as HTMLInputElement).value);
+  store.onChangeTodo({
+    proporty: "content",
+    changeValue: (evt.target as HTMLInputElement).value,
+  });
   remainingCount.value = store.currentTodo.content.length;
 };
 
@@ -40,7 +46,10 @@ const onFileChange = async (evt: Event) => {
   if (!element || !imgPreview.value) return;
   const file = element.files![0];
   const base64 = (await convertBase64(file)) as string;
-  store.onChangeTodo("image", base64);
+  store.onChangeTodo({
+    proporty: "image",
+    changeValue: base64,
+  });
   imgPreview.value.src = base64;
   hasImage.value = true;
   element.value = "";
@@ -50,6 +59,18 @@ const onDeleteTodo = () => {
   const nextTodoId = store.deleteTodo(currentTodo.value.id);
   router.push(`/todo/${nextTodoId}`);
 };
+
+const today = new Date();
+const startTimeLowerLimit = computed(() => {
+  const yesterday = new Date(store.currentTodo.endTime);
+  yesterday.setDate(yesterday.getDate() - 1);
+  return yesterday;
+});
+const endTimeLowerLimit = computed(() => {
+  const nextDay = new Date(store.currentTodo.startTime);
+  nextDay.setDate(nextDay.getDate() + 1);
+  return nextDay;
+});
 </script>
 
 <template>
@@ -68,9 +89,7 @@ const onDeleteTodo = () => {
         type="text"
         placeholder="New item title"
         :value="currentTodo.title"
-        @input="
-          store.onChangeTodo('title', ($event.target as HTMLInputElement).value)
-        "
+        @input="onInputTitleChange"
       />
     </div>
     <div class="flex items-center justify-between h-[30vh] gap-5">
@@ -108,12 +127,15 @@ const onDeleteTodo = () => {
       <div class="flex items-center w-3/5 gap-5">
         <Datepicker
           class="w-full h-12 text-center rounded-lg bg-gray-cool"
-          v-model="picked"
+          v-model="store.currentTodo.startTime"
+          :upper-limit="startTimeLowerLimit"
         />
         {{ "~" }}
         <Datepicker
           class="w-full h-12 text-center rounded-lg bg-gray-cool"
-          v-model="picked"
+          v-model="store.currentTodo.endTime"
+          :upper-limit="today"
+          :lower-limit="endTimeLowerLimit"
         />
       </div>
       <div class="relative flex-1 h-12 rounded-lg bg-primary-100">

@@ -1,9 +1,14 @@
 <script setup lang="ts">
 import { useTodoStore } from "@/stores/todo";
-import { RouterLink, useRoute, useRouter } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
 const store = useTodoStore();
 const route = useRoute();
 const router = useRouter();
+
+const onClickItem = (todoId: string) => {
+  store.setTodo(store.currentTodo);
+  router.push(`/todo/${todoId}`);
+};
 
 const onAddItem = () => {
   store.addTodo();
@@ -15,17 +20,18 @@ const onAddItem = () => {
   <div class="h-screen bg-primary-200 w-[250px]">
     <h1 class="px-3 py-4 text-lg font-semibold">Demo Todo List</h1>
     <div class="mb-6 space-y-2">
-      <RouterLink
-        :to="`/todo/${item.id}`"
+      <div
+        role="link"
+        @click="() => onClickItem(item.id)"
         :class="[
           route.params.id === item.id && 'item-active',
-          'block px-5 py-3 truncate bg-primary-300',
+          'block px-5 py-3 truncate bg-primary-300 cursor-pointer',
         ]"
         v-for="item in store.todos"
         :key="item.id"
       >
         {{ item.order }}. {{ item.title }}
-      </RouterLink>
+      </div>
     </div>
     <button
       type="button"

@@ -2,12 +2,18 @@ import { ref } from "vue";
 import { defineStore, acceptHMRUpdate } from "pinia";
 import { v4 as uuidv4 } from "uuid";
 
+const endTime = new Date();
+const startTime = new Date();
+startTime.setDate(startTime.getDate() - 1);
+
 const INITIAL_TODO = {
   id: uuidv4(),
   order: 1,
   title: "Ititial Item",
   content: "",
   image: "",
+  startTime: startTime,
+  endTime: endTime,
 };
 
 export const useTodoStore = defineStore("todo", () => {
@@ -21,6 +27,8 @@ export const useTodoStore = defineStore("todo", () => {
       title: "New Item" + todos.value.length,
       content: "",
       image: "",
+      startTime: startTime,
+      endTime: endTime,
     };
 
     if (todos.value.length < 10) {
@@ -29,9 +37,16 @@ export const useTodoStore = defineStore("todo", () => {
     }
   };
 
-  type ChangeTodo = "title" | "content" | "image";
-  const onChangeTodo = (proporty: ChangeTodo, changeValue: string) => {
-    currentTodo.value[proporty] = changeValue;
+  type TodoType = typeof INITIAL_TODO;
+  type onChangeTodoEvent = {
+    proporty: keyof TodoType;
+    changeValue: TodoType[keyof TodoType];
+  };
+
+  const onChangeTodo = ({ proporty, changeValue }: onChangeTodoEvent) => {
+    (currentTodo.value as Record<typeof proporty, typeof changeValue>)[
+      proporty
+    ] = changeValue;
     const todosIndex = todos.value.findIndex(
       (todo) => todo.id === currentTodo.value.id
     );
@@ -39,6 +54,15 @@ export const useTodoStore = defineStore("todo", () => {
     const updatedTodos = todos.value.map((todo, index) => {
       if (index === todosIndex) return currentTodo.value;
       return todo;
+    });
+
+    todos.value = updatedTodos;
+  };
+
+  const setTodo = (todo: TodoType) => {
+    const updatedTodos = todos.value.map((originTodo) => {
+      if (originTodo.id === todo.id) return todo;
+      return originTodo;
     });
 
     todos.value = updatedTodos;
@@ -69,6 +93,7 @@ export const useTodoStore = defineStore("todo", () => {
     onChangeTodo,
     setCurrentTodo,
     deleteTodo,
+    setTodo,
   };
 });
 
