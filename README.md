@@ -8,6 +8,7 @@ This template should help get you started developing with Vue 3 in Vite.
 
 - [x] Upload the image and live preview
 - [x] Can free drag-and-drop the todo item
+- [x] Responsive Design
 - [ ] kepp data persist
 - [ ] Compltete unit test
 - [ ] Compltete e2e test
@@ -20,6 +21,11 @@ This template should help get you started developing with Vue 3 in Vite.
 - [Pinia](https://pinia.vuejs.org/) - state management
 - [vue3-datepicker](https://github.com/icehaunter/vue3-datepicker) - Dateepicker
 - [vuedraggable](https://github.com/SortableJS/vue.draggable.next) - drag-and-drop
+
+### Links
+
+- Solution URL: [Repo](https://github.com/yuenu/hw7)
+- Live Site URL: [Live demo](hw7-delta.vercel.app)
 
 ## Project Setup
 
