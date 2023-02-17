@@ -38,7 +38,7 @@ const myList = computed({
             role="link"
             @click="() => onClickItem(element.id)"
             :class="[
-              route.params.id === element.id && 'item-active',
+              store.currentTodo.id === element.id && 'item-active',
               'block px-5 py-3 truncate bg-primary-300 cursor-pointer mb-2',
             ]"
           >
@@ -46,18 +46,6 @@ const myList = computed({
           </div>
         </template>
       </draggable>
-      <!-- <div
-        role="link"
-        @click="() => onClickItem(item.id)"
-        :class="[
-          route.params.id === item.id && 'item-active',
-          'block px-5 py-3 truncate bg-primary-300 cursor-pointer',
-        ]"
-        v-for="item in store.todos"
-        :key="item.id"
-      >
-        {{ item.order }}. {{ item.title }}
-      </div> -->
     </div>
     <button
       type="button"
