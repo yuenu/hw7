@@ -35,7 +35,7 @@ const myList = computed({
     >
       Demo Todo List
       <IconClose
-        class="w-6 h-6"
+        class="w-6 h-6 md:hidden"
         role="button"
         @click="store.setIsMenuOpen(false)"
       />
